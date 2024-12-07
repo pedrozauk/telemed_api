@@ -79,3 +79,15 @@ def procura_medicos_paginado(session: Session,
         conteudo=medicos
     )
 
+
+
+def inativa_medico(id_medico: int, session: Session) -> bool:
+    stmt = select(models.Medico).filter_by(id=id_medico)
+    medico = session.exec(stmt).first()
+    if not medico:
+        return False
+
+    session.delete(medico)
+    session.commit()
+
+    return True

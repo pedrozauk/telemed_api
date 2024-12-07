@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Path, Depends
 from typing import Annotated
 from sqlmodel import Session
 
@@ -36,4 +36,22 @@ def inclui_novo_medico(payload: models.NovoMedico,
         mensagem="Médico incluido com sucesso",
         conteudo=novo_medico
     )
+
+@medico_router.delete('/{id_medico}')
+def deleta_medico(id_medico: int,
+                  session: SessionDeps
+                  )->schemas.ComumResponse[None]:
+    deletado = crud.inativa_medico(id_medico, session)
+
+    if not deletado:
+        return schemas.ComumResponse[None](
+            status=0,
+            mensagem="Não foi possível deletar o médico, registro não encontrado",
+            conteudo=None
+        )
     
+    return schemas.ComumResponse[None](
+            status=1,
+            mensagem="Medico deletado com sucesso",
+            conteudo=None
+        )    
