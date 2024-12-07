@@ -22,7 +22,18 @@ def encontra_medico_com_paginacao(
 
 
 @medico_router.post('/')
-def inclui_novo_medico(body: Annotated[models.Medico, Body()],
+def inclui_novo_medico(payload: models.NovoMedico,
                        session: SessionDeps
                        ) -> schemas.ComumResponse[models.Medico]:
-    ...
+    
+    novo_medico = models.Medico.model_validate(payload)
+    session.add(novo_medico)
+    session.commit()
+    session.refresh(novo_medico)
+
+    return schemas.ComumResponse[models.Medico](
+        status=1,
+        mensagem="Médico incluido com sucesso",
+        conteudo=novo_medico
+    )
+    

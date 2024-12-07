@@ -1,17 +1,25 @@
 
-from sqlmodel import SQLModel, Field
-from datetime import date
+from sqlmodel import SQLModel, Field, Date
+import datetime
 from typing import Optional
 
 
-class Medico(SQLModel, table=True):
 
-    id: Optional[int] = Field(primary_key=True)
-    nome_completo: str = Field(default=None, index=True)
+
+
+class MedicoBase(SQLModel):
+
+
+    nome_completo: str = Field(index=True)
     cpf: str
-    data_nascimento: date
+    data_nascimento: datetime.date = Field(allow_mutation=True)
     conselho: str = Field(index=True)
     numero_conselho: int
     uf_conselho: str
     status: str
 
+class NovoMedico(MedicoBase):
+    ...
+
+class Medico(MedicoBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
