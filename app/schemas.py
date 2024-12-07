@@ -1,7 +1,13 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import TypeVar, Generic
 
 T = TypeVar("T")
+
+
+class ComumResponse(BaseModel, Generic[T]):
+    status: int 
+    mensagem: str = Field(default="")
+    conteudo: T
 
 
 class BasePaginacao(BaseModel):
@@ -13,12 +19,11 @@ class BasePaginacao(BaseModel):
     limite: int
 
 
-class PaginacaoResponse(BasePaginacao, Generic[T]):
+class PaginacaoResponse(ComumResponse, BasePaginacao, Generic[T]):
     """
     Modelo de paginacao utilizado para retornos de rotas paginadas
     """
     
-    conteudo: list[T]
     qtd_itens: int
     qtd_paginas: int
 

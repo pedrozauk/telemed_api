@@ -64,13 +64,14 @@ def procura_medicos_paginado(session: Session,
     total = session.exec(select(func.count()).select_from(stmt.subquery())).one()
 
     paginas = 0
-    
+
     if total:
         paginas = ceil(total/limite)
 
     medicos = session.exec(stmt).all()
 
-    return schemas.PaginacaoResponse[models.Medico](
+    return schemas.PaginacaoResponse[list[models.Medico]](
+        status=1,
         pagina=pagina,
         limite=limite,
         qtd_itens=total,

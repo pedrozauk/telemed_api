@@ -14,7 +14,7 @@ medico_router = APIRouter(prefix='/medico', tags=['Medico'])
 def encontra_medico_com_paginacao(
     body: Annotated[schemas.PaginacaoRequest[schemas.FiltroMedico], Body()],
     session: SessionDeps,
-                            ) -> schemas.PaginacaoResponse[models.Medico]:
+                            ) -> schemas.PaginacaoResponse[list[models.Medico]]:
 
     retorno = crud.procura_medicos_paginado(session, body.pagina, body.limite, body.filtro)
     
@@ -23,5 +23,6 @@ def encontra_medico_com_paginacao(
 
 @medico_router.post('/')
 def inclui_novo_medico(body: Annotated[models.Medico, Body()],
-                       session: SessionDeps):
+                       session: SessionDeps
+                       ) -> schemas.ComumResponse[models.Medico]:
     ...
