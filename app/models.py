@@ -16,7 +16,7 @@ class MedicoBase(SQLModel):
     conselho: str = Field(index=True)
     numero_conselho: int
     uf_conselho: str
-    status: str
+    status: str = Field(default='A')
 
 class NovoMedico(MedicoBase):
     ...
