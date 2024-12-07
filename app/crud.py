@@ -91,3 +91,11 @@ def inativa_medico(id_medico: int, session: Session) -> bool:
     session.commit()
 
     return True
+
+def inclui_novo_medico(novo_medico: models.NovoMedico, session: Session)->models.Medico:
+    medico_db = models.Medico.model_validate(novo_medico)
+    session.add(medico_db)
+    session.commit()
+    session.refresh(medico_db)
+
+    return medico_db

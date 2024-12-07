@@ -26,10 +26,7 @@ def inclui_novo_medico(payload: models.NovoMedico,
                        session: SessionDeps
                        ) -> schemas.ComumResponse[models.Medico]:
     
-    novo_medico = models.Medico.model_validate(payload)
-    session.add(novo_medico)
-    session.commit()
-    session.refresh(novo_medico)
+    novo_medico = crud.inclui_novo_medico(payload, session)
 
     return schemas.ComumResponse[models.Medico](
         status=1,
