@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app.dependencies import SessionDeps
 from app import crud, models, schemas
-
+import app.exceptions as excp
 
 medico_router = APIRouter(prefix='/medico', tags=['Medico'])
 
@@ -52,3 +52,40 @@ def deleta_medico(id_medico: int,
             mensagem="Medico deletado com sucesso",
             conteudo=None
         )    
+
+
+@medico_router.patch('/{id_medico}')
+def altera_medico(id_medico: int, 
+                  payload: models.AtualizacaoMedico,
+                  session: SessionDeps
+                  )-> schemas.ComumResponse[models.Medico|None]:
+    
+    """
+    Altera um médico no banco de dados
+
+    Serão somente atualizados os campos que forem passados no payload
+    
+    """
+    if id_medico == 0:
+        return schemas.ComumResponse[None](
+            status=0,
+            mensagem="Id inválido",
+            conteudo=None
+        ) 
+    try:
+        medico_atualizado = crud.altera_medico(id_medico, payload, session)
+    except excp.NenhumRegistroRetornado:
+
+        return schemas.ComumResponse[None](
+            status=0,
+            mensagem="Medico não encontrado",
+            conteudo=None
+        )
+
+    return schemas.ComumResponse[models.Medico](
+        status=1,
+        mensagem="Médico alterado com sucesso",
+        conteudo=medico_atualizado
+    ) 
+
+

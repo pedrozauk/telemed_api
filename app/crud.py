@@ -1,9 +1,9 @@
-from sqlmodel import select, Session
+from sqlmodel import select, Session, update
 from sqlalchemy import func
 from math import ceil
 
 from app import models, schemas
-
+import app.exceptions as excp
 
 
 def procura_medicos(session: Session,
@@ -68,6 +68,7 @@ def procura_medicos_paginado(session: Session,
     if total:
         paginas = ceil(total/limite)
 
+    #TODO - Ajustar paginação no stmt
     medicos = session.exec(stmt).all()
 
     return schemas.PaginacaoResponse[list[models.Medico]](
@@ -82,7 +83,14 @@ def procura_medicos_paginado(session: Session,
 
 
 def inativa_medico(id_medico: int, session: Session) -> bool:
-    stmt = select(models.Medico).filter_by(id=id_medico)
+    """
+    Função para inativar medicos
+    """
+
+    stmt = (
+        select(models.Medico)
+        .filter_by(id=id_medico))
+    
     medico = session.exec(stmt).first()
     if not medico or medico.status == 'I':
         return False
@@ -93,9 +101,37 @@ def inativa_medico(id_medico: int, session: Session) -> bool:
     return True
 
 def inclui_novo_medico(novo_medico: models.NovoMedico, session: Session)->models.Medico:
+    """
+    Função para incluir novos medicos
+    """
     medico_db = models.Medico.model_validate(novo_medico)
     session.add(medico_db)
     session.commit()
     session.refresh(medico_db)
 
     return medico_db
+
+def altera_medico(id_medico: int, 
+                  dados: models.MedicoBase, 
+                  session: Session
+                  )->models.Medico:
+    """
+    Função para alterar medicos
+    Utiliza exclude_unset para remover atributos não enviados no parametro "dados".
+    """
+    dados_a_atualizar = dados.model_dump(exclude_unset=True)
+    stmt = (
+            update(models.Medico)
+            .where(models.Medico.id == id_medico)
+            .values(**dados_a_atualizar)
+            .returning(models.Medico)
+        )
+    medico_atualizado = session.exec(stmt).scalar()
+    
+    session.commit()
+    session.refresh(medico_atualizado)
+
+    if not medico_atualizado:
+        raise excp.NenhumRegistroRetornado()
+    
+    return medico_atualizado
