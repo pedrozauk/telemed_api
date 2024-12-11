@@ -68,7 +68,8 @@ def procura_medicos_paginado(session: Session,
     if total:
         paginas = ceil(total/limite)
 
-    #TODO - Ajustar paginação no stmt
+    stmt = stmt.offset(offset).limit(limite)
+
     medicos = session.exec(stmt).all()
 
     return schemas.PaginacaoResponse[list[models.Medico]](

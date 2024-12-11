@@ -1,5 +1,5 @@
 
-from sqlmodel import SQLModel, Field, Date
+from sqlmodel import SQLModel, Field
 import datetime
 from typing import Optional
 
@@ -22,6 +22,8 @@ class NovoMedico(MedicoBase):
     ...
 
 class AtualizacaoMedico(SQLModel):
+
+
     nome_completo: Optional[str] = None 
     cpf: Optional[str] = None
     data_nascimento: Optional[datetime.date] = None
@@ -31,4 +33,20 @@ class AtualizacaoMedico(SQLModel):
     status: Optional[str] = None
 
 class Medico(MedicoBase, table=True):
+
+
     id: Optional[int] = Field(default=None, primary_key=True)
+
+
+
+class UsuarioBase(SQLModel):
+
+    apelido: str
+    senha: str
+    status: str = Field(default='A')
+
+
+class Usuario(UsuarioBase, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    password : str 
